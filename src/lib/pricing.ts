@@ -103,13 +103,13 @@ export interface QuoteConfig {
   quantity: number;
 }
 
-export function calculateQuote(config: QuoteConfig): {
+export function calculateQuote(config: QuoteConfig, overrideTables?: Record<ProductType, PriceTable>): {
   subtotal: number;
   area: number;
   total: number;
   breakdown: { label: string; value: number }[];
 } {
-  const table = PRICE_TABLES[config.product];
+  const table = (overrideTables ?? PRICE_TABLES)[config.product];
   const area = (config.width * config.height) / 10000;
 
   const glassBase = area * table.basePerM2 * table.glassMultiplier[config.glassType];

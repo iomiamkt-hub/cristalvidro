@@ -7,6 +7,7 @@ import type {
   ProfileType,
   InstallationType,
   ProductSubtype,
+  PriceTable,
 } from "@/lib/pricing";
 
 export type Step = "product" | "dimensions" | "glass" | "extras" | "summary" | "contact";
@@ -26,8 +27,10 @@ export interface QuoteState {
   customerPhone: string;
   customerEmail: string;
   hasHydrated: boolean;
+  priceTables: Record<ProductType, PriceTable> | null;
 
   setStep: (step: Step) => void;
+  setPriceTables: (tables: Record<ProductType, PriceTable>) => void;
   setProduct: (product: ProductType) => void;
   setSubtype: (subtype: ProductSubtype) => void;
   setDimensions: (width: number, height: number) => void;
@@ -60,6 +63,7 @@ const initialState = {
   customerPhone: "",
   customerEmail: "",
   hasHydrated: false,
+  priceTables: null,
 };
 
 export const useQuoteStore = create<QuoteState>()(
@@ -68,6 +72,7 @@ export const useQuoteStore = create<QuoteState>()(
       ...initialState,
 
       setStep: (step) => set({ currentStep: step }),
+      setPriceTables: (priceTables) => set({ priceTables }),
       setProduct: (product) => set({ product, subtype: null }),
       setSubtype: (subtype) => set({ subtype }),
       setDimensions: (width, height) => set({ width, height }),
@@ -97,6 +102,7 @@ export const useQuoteStore = create<QuoteState>()(
       name: "cristalvidro-quote",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        // priceTables excluded — always fresh-fetched from /api/config
         currentStep: state.currentStep,
         product: state.product,
         subtype: state.subtype,

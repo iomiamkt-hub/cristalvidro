@@ -44,7 +44,7 @@ function FieldInput({
 }
 
 export function StepContact() {
-  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, customerName, customerPhone, customerEmail, setCustomer, reset } =
+  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, priceTables, customerName, customerPhone, customerEmail, setCustomer, reset } =
     useQuoteStore();
 
   const [name, setName] = useState(customerName);
@@ -73,13 +73,24 @@ export function StepContact() {
     if (!validate()) return;
     setLoading(true);
     setCustomer(name, phone, email);
-    await new Promise((r) => setTimeout(r, 1200));
+    await fetch("/api/quotes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customer: { name, phone, email },
+        product, subtype, width, height, glassType, thickness, profile, installation, quantity,
+        total: result.total,
+      }),
+    }).catch(() => {});
     setLoading(false);
     setSubmitted(true);
   }
 
   if (!product) return null;
-  const result = calculateQuote({ product, subtype: subtype ?? undefined, width, height, glassType, thickness, profile, installation, quantity });
+  const result = calculateQuote(
+    { product, subtype: subtype ?? undefined, width, height, glassType, thickness, profile, installation, quantity },
+    priceTables ?? undefined
+  );
   const subtypeLabel = subtype ? PRODUCT_SUBTYPES[product].find((o) => o.id === subtype)?.title : null;
 
   const whatsappText = [

@@ -15,11 +15,14 @@ const PROFILE_L: Record<string, string> = {
 
 export function StepSummary() {
   const s = useQuoteStore();
-  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, nextStep } = s;
+  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, priceTables, nextStep } = s;
 
   if (!product) return null;
 
-  const result = calculateQuote({ product, subtype: subtype ?? undefined, width, height, glassType, thickness, profile, installation, quantity });
+  const result = calculateQuote(
+    { product, subtype: subtype ?? undefined, width, height, glassType, thickness, profile, installation, quantity },
+    priceTables ?? undefined
+  );
   const subtypeLabel = subtype ? PRODUCT_SUBTYPES[product].find((o) => o.id === subtype)?.title : null;
 
   const lines = [

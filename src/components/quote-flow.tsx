@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useQuoteStore } from "@/store/quote-store";
 import { StepProduct } from "@/components/steps/step-product";
 import { StepDimensions } from "@/components/steps/step-dimensions";
@@ -23,7 +23,14 @@ const STEPS = {
 };
 
 export function QuoteFlow() {
-  const { currentStep, prevStep } = useQuoteStore();
+  const { currentStep, prevStep, setPriceTables } = useQuoteStore();
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then(setPriceTables)
+      .catch(() => {});
+  }, [setPriceTables]);
   const prevStepRef = useRef(currentStep);
   const dir = STEP_ORDER.indexOf(currentStep) >= STEP_ORDER.indexOf(prevStepRef.current) ? 1 : -1;
   prevStepRef.current = currentStep;
