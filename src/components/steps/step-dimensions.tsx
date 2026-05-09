@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { useQuoteStore } from "@/store/quote-store";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { StepHeading } from "@/components/ui/step-heading";
+import { StepActions } from "@/components/ui/step-actions";
+import { cn } from "@/lib/utils";
 
-const PRESETS: { label: string; w: number; h: number }[] = [
+const PRESETS = [
   { label: "90 × 200", w: 90, h: 200 },
   { label: "100 × 210", w: 100, h: 210 },
   { label: "120 × 200", w: 120, h: 200 },
@@ -21,11 +21,11 @@ export function StepDimensions() {
   const [errors, setErrors] = useState<{ w?: string; h?: string }>({});
 
   function validate() {
-    const newErrors: { w?: string; h?: string } = {};
-    if (!w || Number(w) < 20) newErrors.w = "Mínimo 20 cm";
-    if (!h || Number(h) < 20) newErrors.h = "Mínimo 20 cm";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const e: { w?: string; h?: string } = {};
+    if (!w || Number(w) < 20) e.w = "mín. 20 cm";
+    if (!h || Number(h) < 20) e.h = "mín. 20 cm";
+    setErrors(e);
+    return !e.w && !e.h;
   }
 
   function handleContinue() {
@@ -38,96 +38,86 @@ export function StepDimensions() {
   const area = ((Number(w) || 0) * (Number(h) || 0)) / 10000;
 
   return (
-    <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h2 className="text-2xl font-bold text-white tracking-tight">Qual o tamanho?</h2>
-        <p className="text-zinc-500 text-sm mt-1">Informe as medidas em centímetros</p>
-      </motion.div>
+    <div className="flex flex-col flex-1">
+      <StepHeading>Qual o tamanho?</StepHeading>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.4 }}
-        className="space-y-4"
-      >
-        <div>
-          <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">
-            Medidas prontas
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {PRESETS.map((preset) => (
-              <button
-                key={preset.label}
-                onClick={() => { setW(String(preset.w)); setH(String(preset.h)); }}
-                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                  w === String(preset.w) && h === String(preset.h)
-                    ? "border-white/40 bg-white/10 text-white"
-                    : "border-white/10 bg-transparent text-zinc-500 hover:border-white/25 hover:text-zinc-300"
-                }`}
-              >
-                {preset.label} cm
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Input
-            label="Largura"
-            type="number"
-            value={w}
-            onChange={(e) => { setW(e.target.value); setErrors({}); }}
-            suffix="cm"
-            error={errors.w}
-            min={20}
-            max={500}
-          />
-          <Input
-            label="Altura"
-            type="number"
-            value={h}
-            onChange={(e) => { setH(e.target.value); setErrors({}); }}
-            suffix="cm"
-            error={errors.h}
-            min={20}
-            max={500}
-          />
-        </div>
-
-        <Input
-          label="Quantidade de peças"
-          type="number"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          min={1}
-          max={50}
-        />
-
-        {area > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10"
-          >
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-base">
-              📐
-            </div>
-            <div>
-              <p className="text-xs text-zinc-500">Área calculada por peça</p>
-              <p className="text-white font-semibold text-sm">{area.toFixed(2)} m²</p>
-            </div>
-          </motion.div>
-        )}
-      </motion.div>
-
-      <div className="flex gap-3 pt-2">
-        <Button variant="ghost" onClick={prevStep} className="flex-1">
-          Voltar
-        </Button>
-        <Button onClick={handleContinue} className="flex-1">
-          Continuar
-        </Button>
+      {/* Presets */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {PRESETS.map((p) => {
+          const active = w === String(p.w) && h === String(p.h);
+          return (
+            <button
+              key={p.label}
+              onClick={() => { setW(String(p.w)); setH(String(p.h)); setErrors({}); }}
+              className={cn(
+                "h-8 px-3 rounded-lg text-xs font-medium transition-all duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
+                active
+                  ? "bg-white text-zinc-900"
+                  : "bg-white/[0.04] text-zinc-500 border border-white/[0.07] hover:text-zinc-300"
+              )}
+            >
+              {p.label}
+            </button>
+          );
+        })}
       </div>
+
+      {/* Inputs largura + altura */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        {[
+          { label: "Largura", val: w, set: setW, err: errors.w },
+          { label: "Altura",  val: h, set: setH, err: errors.h },
+        ].map(({ label, val, set, err }) => (
+          <div key={label} className="flex flex-col gap-1.5">
+            <label className="text-[10px] text-zinc-600 uppercase tracking-widest">{label}</label>
+            <div className="relative">
+              <input
+                type="number"
+                value={val}
+                onChange={(e) => { set(e.target.value); setErrors({}); }}
+                min={20}
+                max={500}
+                className={cn(
+                  "w-full h-12 bg-white/[0.04] border rounded-xl px-4 pr-10",
+                  "text-white text-sm outline-none transition-all duration-150",
+                  "placeholder:text-zinc-700",
+                  err
+                    ? "border-red-500/40 focus:border-red-400/60"
+                    : "border-white/[0.08] focus:border-white/25"
+                )}
+              />
+              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-600 text-xs pointer-events-none">cm</span>
+            </div>
+            {err && <p className="text-[10px] text-red-400">{err}</p>}
+          </div>
+        ))}
+      </div>
+
+      {/* Quantidade */}
+      <div className="flex flex-col gap-1.5 mb-6">
+        <label className="text-[10px] text-zinc-600 uppercase tracking-widest">Quantidade</label>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setQ(String(Math.max(1, Number(q) - 1)))}
+            className="w-10 h-10 rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white hover:border-white/20 transition-all text-lg flex items-center justify-center"
+          >
+            −
+          </button>
+          <span className="text-white font-semibold text-base w-8 text-center tabular-nums">{q}</span>
+          <button
+            onClick={() => setQ(String(Math.min(50, Number(q) + 1)))}
+            className="w-10 h-10 rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white hover:border-white/20 transition-all text-lg flex items-center justify-center"
+          >
+            +
+          </button>
+          <span className="text-zinc-700 text-xs ml-1">
+            {area > 0 ? `${(area * Number(q)).toFixed(2)} m² total` : "peças"}
+          </span>
+        </div>
+      </div>
+
+      <StepActions onNext={handleContinue} onBack={prevStep} />
     </div>
   );
 }
