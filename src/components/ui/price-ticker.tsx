@@ -47,9 +47,9 @@ export function PriceTicker() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 </span>
-                <span className="text-zinc-500 text-xs">estimativa</span>
+                <span className="text-[11px] text-white/25 uppercase tracking-[0.12em]">estimativa</span>
               </div>
-              <p className="text-white font-semibold text-base">
+              <p className="text-white font-medium text-[15px]">
                 <AnimatedPrice value={total} />
               </p>
             </div>

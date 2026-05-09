@@ -31,44 +31,55 @@ export function QuoteFlow() {
 
   const StepComponent = STEPS[currentStep];
   const stepIndex = STEP_ORDER.indexOf(currentStep);
-  const total = STEP_ORDER.length;
   const isContact = currentStep === "contact";
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="min-h-dvh flex flex-col bg-[#0d0d0d]">
+
       {/* Header */}
-      <header className="flex items-center justify-between px-6 pt-10 pb-2 max-w-md mx-auto w-full">
-        <span className="text-sm font-semibold tracking-tight text-white">Cristal Vidro</span>
+      <header className="max-w-md mx-auto w-full px-7 pt-12 pb-0">
+        <div className="flex items-center justify-between">
+
+          {/* Marca CV */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 border border-white/[0.18] rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-[11px] font-bold tracking-widest text-white select-none">CV</span>
+            </div>
+            <span className="text-[13px] font-medium text-white/50 tracking-wide">
+              Cristal Vidro
+            </span>
+          </div>
+
+          {/* Contador de step */}
+          {!isContact && (
+            <span className="text-[11px] text-white/20 tabular-nums tracking-wider">
+              {stepIndex + 1} — {STEP_ORDER.length}
+            </span>
+          )}
+        </div>
+
+        {/* Linha de progresso */}
         {!isContact && (
-          <span className="text-xs text-zinc-600 tabular-nums">
-            {stepIndex + 1} / {total}
-          </span>
+          <div className="mt-8 h-px bg-white/[0.07] overflow-hidden">
+            <motion.div
+              className="h-full bg-white/60"
+              initial={false}
+              animate={{ width: `${((stepIndex + 1) / STEP_ORDER.length) * 100}%` }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            />
+          </div>
         )}
       </header>
 
-      {/* Progress line */}
-      {!isContact && (
-        <div className="px-6 max-w-md mx-auto w-full">
-          <div className="h-px bg-white/8 rounded-full overflow-hidden mt-3">
-            <motion.div
-              className="h-full bg-white rounded-full"
-              initial={false}
-              animate={{ width: `${((stepIndex + 1) / total) * 100}%` }}
-              transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Step content */}
-      <main className="flex-1 flex flex-col px-6 pt-10 pb-32 max-w-md mx-auto w-full">
+      {/* Conteúdo */}
+      <main className="flex-1 flex flex-col px-7 pt-12 pb-36 max-w-md mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, x: dir * 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: dir * -20 }}
-            transition={{ duration: 0.26, ease: [0.25, 0.46, 0.45, 0.94] as const }}
+            initial={{ opacity: 0, y: dir > 0 ? 16 : -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: dir > 0 ? -12 : 12 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="flex-1 flex flex-col"
           >
             <StepComponent />

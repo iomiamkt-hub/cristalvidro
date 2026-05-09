@@ -19,29 +19,29 @@ export function StepActions({
   loading = false,
 }: StepActionsProps) {
   return (
-    <div className="mt-auto pt-8 flex items-center gap-4">
+    <div className="mt-auto pt-10 flex items-center gap-5">
       {onBack && (
         <button
           onClick={onBack}
-          className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors duration-150 flex-shrink-0"
+          className="text-[13px] text-white/25 hover:text-white/50 transition-colors duration-200 flex-shrink-0 tracking-wide"
         >
-          ← Voltar
+          Voltar
         </button>
       )}
       <motion.button
         onClick={onNext}
         disabled={disabled || loading}
-        whileTap={disabled || loading ? {} : { scale: 0.97 }}
+        whileTap={disabled || loading ? {} : { scale: 0.975 }}
         className={cn(
-          "flex-1 h-12 rounded-xl text-sm font-semibold transition-all duration-200",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
+          "flex-1 h-[52px] rounded-xl text-[14px] font-semibold tracking-wide",
+          "transition-all duration-200 focus-visible:outline-none",
           disabled
-            ? "bg-white/6 text-zinc-600 cursor-not-allowed"
-            : "bg-white text-zinc-900 hover:bg-zinc-100 active:bg-zinc-200"
+            ? "bg-white/[0.05] text-white/20 cursor-not-allowed"
+            : "bg-white text-zinc-950 hover:bg-zinc-100"
         )}
       >
         {loading ? (
-          <span className="inline-block w-4 h-4 border-2 border-zinc-400 border-t-zinc-900 rounded-full animate-spin" />
+          <span className="inline-block w-[18px] h-[18px] border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
         ) : (
           nextLabel
         )}

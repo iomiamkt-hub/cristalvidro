@@ -7,11 +7,11 @@ import { ChipGroup } from "@/components/ui/chip-group";
 import { StepHeading } from "@/components/ui/step-heading";
 import { StepActions } from "@/components/ui/step-actions";
 
-const GLASS: { id: GlassType; label: string; badge: string }[] = [
-  { id: "temperado", label: "Temperado",  badge: "padrão" },
-  { id: "laminado",  label: "Laminado",   badge: "+35%" },
-  { id: "jateado",   label: "Jateado",    badge: "+25%" },
-  { id: "espelhado", label: "Espelhado",  badge: "+40%" },
+const GLASS: { id: GlassType; label: string; sublabel: string }[] = [
+  { id: "temperado", label: "Temperado",  sublabel: "Padrão de segurança" },
+  { id: "laminado",  label: "Laminado",   sublabel: "Fragmentos retidos" },
+  { id: "jateado",   label: "Jateado",    sublabel: "Translúcido fosco" },
+  { id: "espelhado", label: "Espelhado",  sublabel: "Reflexo parcial" },
 ];
 
 const THICKNESS: { value: ThicknessOption; label: string }[] = [
@@ -28,12 +28,12 @@ export function StepGlass() {
     <div className="flex flex-col flex-1">
       <StepHeading>Tipo de vidro</StepHeading>
 
-      <div className="mb-8">
+      <div className="mb-10">
         {GLASS.map((g, i) => (
           <SelectRow
             key={g.id}
             label={g.label}
-            badge={g.badge}
+            sublabel={g.sublabel}
             selected={glassType === g.id}
             onClick={() => setGlassType(g.id)}
             index={i}
