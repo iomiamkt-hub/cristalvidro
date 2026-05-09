@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import { cookies } from "next/headers";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth";
-import { getQuotes } from "@/lib/server/storage";
+import { getQuotes } from "@/services/quotes";
 
 export async function GET() {
   const store = await cookies();

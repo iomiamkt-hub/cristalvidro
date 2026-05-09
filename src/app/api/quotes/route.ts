@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 
-import { appendQuote, getQuotes } from "@/lib/server/storage";
+import { insertQuote, getQuotes } from "@/services/quotes";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth";
-import type { StoredQuote } from "@/lib/server/storage";
+import type { StoredQuote } from "@/lib/supabase/types";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
@@ -29,8 +29,10 @@ export async function POST(req: Request) {
     total: Number(body.total ?? 0),
   };
 
-  await appendQuote(quote);
-  return Response.json({ ok: true, id: quote.id });
+  const result = await insertQuote(quote);
+  if (!result) return Response.json({ error: "Failed to save quote" }, { status: 500 });
+
+  return Response.json({ ok: true, id: result.id });
 }
 
 export async function GET() {
@@ -39,6 +41,5 @@ export async function GET() {
   if (!token || !(await verifySession(token))) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const quotes = await getQuotes();
-  return Response.json(quotes);
+  return Response.json(await getQuotes());
 }

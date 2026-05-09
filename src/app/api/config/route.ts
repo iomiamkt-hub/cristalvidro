@@ -1,6 +1,6 @@
 export const runtime = "nodejs";
 
-import { getPriceTables } from "@/lib/server/storage";
+import { getPriceTables } from "@/services/pricing";
 
 export async function GET() {
   const priceTables = await getPriceTables();

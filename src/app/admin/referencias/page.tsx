@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { cn } from "@/lib/utils";
-import type { StoredReference } from "@/lib/server/storage";
+import type { StoredReference } from "@/lib/supabase/types";
 
 const PRODUCTS = [
   { id: "box",          label: "Box" },

@@ -2,8 +2,7 @@ export const runtime = "nodejs";
 
 import { cookies } from "next/headers";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth";
-import { getReferences, saveReferences } from "@/lib/server/storage";
-import type { StoredReference } from "@/lib/server/storage";
+import { getReferences, addReference, deleteReference } from "@/services/references";
 
 async function auth() {
   const store = await cookies();
@@ -22,17 +21,13 @@ export async function POST(req: Request) {
   if (!body?.title || !body?.imageUrl) {
     return Response.json({ error: "title and imageUrl required" }, { status: 400 });
   }
-  const ref: StoredReference = {
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
+  const ref = await addReference({
     title: String(body.title),
     description: String(body.description ?? ""),
     imageUrl: String(body.imageUrl),
     product: String(body.product ?? "box"),
-  };
-  const refs = await getReferences();
-  refs.unshift(ref);
-  await saveReferences(refs);
+  });
+  if (!ref) return Response.json({ error: "Failed to add reference" }, { status: 500 });
   return Response.json(ref);
 }
 
@@ -40,7 +35,7 @@ export async function DELETE(req: Request) {
   if (!(await auth())) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await req.json().catch(() => ({}));
   if (!id) return Response.json({ error: "id required" }, { status: 400 });
-  const refs = await getReferences();
-  await saveReferences(refs.filter((r) => r.id !== id));
+  const ok = await deleteReference(id);
+  if (!ok) return Response.json({ error: "Failed to delete reference" }, { status: 500 });
   return Response.json({ ok: true });
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatCurrency } from "@/lib/utils";
-import type { StoredQuote } from "@/lib/server/storage";
+import type { StoredQuote } from "@/lib/supabase/types";
 
 const PRODUCT_LABELS: Record<string, string> = {
   box: "Box de Banheiro",
