@@ -2,68 +2,87 @@
 
 import { motion } from "framer-motion";
 
-const FEATURES = [
+const TRUST_BADGES = [
   { icon: "⚡", label: "Orçamento em 2 min" },
-  { icon: "🔒", label: "Vidro temperado certificado" },
+  { icon: "🔒", label: "Vidro certificado ABNT" },
   { icon: "🛠️", label: "Instalação inclusa" },
   { icon: "✅", label: "Garantia de 1 ano" },
 ];
 
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.55, delay, ease: [0.25, 0.46, 0.45, 0.94] as const },
+});
+
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-4 pt-16 pb-10 sm:pt-24 sm:pb-14">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,255,255,0.07) 0%, transparent 70%)",
-        }}
-      />
+    <section className="relative overflow-hidden px-4 pt-14 pb-8 sm:pt-20 sm:pb-12">
+      {/* Orb de fundo */}
+      <div className="glow-orb-top" />
 
       <div className="relative max-w-2xl mx-auto text-center">
+        {/* Badge live */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-xs font-medium text-zinc-400 mb-6"
+          {...fadeUp(0)}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/12 bg-white/[0.04] text-xs font-medium text-zinc-400 mb-5"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+          </span>
           Orçamentos online em tempo real
         </motion.div>
 
+        {/* Headline */}
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight"
+          {...fadeUp(0.08)}
+          className="text-[2.2rem] sm:text-5xl font-bold text-white tracking-tight leading-[1.1]"
         >
-          Vidro sob medida,{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-200 to-zinc-500">
+          Vidro sob medida,
+          <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-300 to-zinc-500">
             orçamento na hora
           </span>
         </motion.h1>
 
+        {/* Subheadline */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-4 text-zinc-500 text-base sm:text-lg leading-relaxed max-w-md mx-auto"
+          {...fadeUp(0.15)}
+          className="mt-4 text-zinc-500 text-sm sm:text-base leading-relaxed max-w-sm mx-auto"
         >
-          Box, sacada, guarda-corpo ou espelho. Configure, veja o preço e solicite em menos de 2 minutos.
+          Box, sacada, guarda-corpo ou espelho — configure, veja o preço e solicite em menos de 2 minutos.
         </motion.p>
 
+        {/* Trust badges */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2"
+          {...fadeUp(0.25)}
+          className="mt-7 flex flex-wrap justify-center gap-x-5 gap-y-2"
         >
-          {FEATURES.map((f) => (
-            <span key={f.label} className="flex items-center gap-1.5 text-xs text-zinc-500">
-              <span>{f.icon}</span>
-              {f.label}
+          {TRUST_BADGES.map((b) => (
+            <span key={b.label} className="flex items-center gap-1.5 text-xs text-zinc-600">
+              <span className="text-sm">{b.icon}</span>
+              {b.label}
             </span>
           ))}
+        </motion.div>
+
+        {/* Seta para scroll */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="mt-8 flex justify-center"
+        >
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="text-zinc-700"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </motion.div>
         </motion.div>
       </div>
     </section>

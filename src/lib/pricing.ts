@@ -4,6 +4,49 @@ export type ThicknessOption = 6 | 8 | 10 | 12;
 export type ProfileType = "sem-perfil" | "aluminio" | "inox" | "preto-fosco";
 export type InstallationType = "parafuso" | "embutido" | "frameless";
 
+// Opções específicas por produto
+export type BoxSubtype = "abrir" | "correr" | "canto" | "banheira";
+export type SacadaSubtype = "reta" | "canto-90" | "canto-135" | "curva";
+export type GuardaCorpoSubtype = "escada" | "mezanino" | "varanda" | "piscina";
+export type EspelhoSubtype = "simples" | "bisote" | "lapidado" | "decorativo";
+
+export type ProductSubtype = BoxSubtype | SacadaSubtype | GuardaCorpoSubtype | EspelhoSubtype;
+
+export interface ProductSubtypeOption {
+  id: ProductSubtype;
+  title: string;
+  description: string;
+  priceAdj: number; // valor fixo adicionado ao total
+  recommended?: boolean;
+}
+
+export const PRODUCT_SUBTYPES: Record<ProductType, ProductSubtypeOption[]> = {
+  box: [
+    { id: "abrir", title: "Porta de Abrir", description: "Abertura frontal com dobradiças. Clássico e prático", priceAdj: 0, recommended: true },
+    { id: "correr", title: "Porta de Correr", description: "Desliza sobre trilho. Ideal para espaços compactos", priceAdj: 120 },
+    { id: "canto", title: "Box de Canto", description: "Duas folhas em L. Aproveitamento máximo do espaço", priceAdj: 280 },
+    { id: "banheira", title: "Box Banheira", description: "Fechamento para banheira. Horizontal com folha rebatível", priceAdj: 200 },
+  ],
+  sacada: [
+    { id: "reta", title: "Sacada Reta", description: "Fechamento linear padrão. O mais comum em apartamentos", priceAdj: 0, recommended: true },
+    { id: "canto-90", title: "Canto 90°", description: "Duas faces perpendiculares com canto reto", priceAdj: 350 },
+    { id: "canto-135", title: "Canto 135°", description: "Canto em diagonal. Melhor fluxo de ar e visual", priceAdj: 420 },
+    { id: "curva", title: "Sacada Curva", description: "Curvatura personalizada. Projeto sob medida exclusivo", priceAdj: 680 },
+  ],
+  "guarda-corpo": [
+    { id: "escada", title: "Escada", description: "Corrimão lateral com vidro inclinado seguindo degraus", priceAdj: 180, recommended: true },
+    { id: "mezanino", title: "Mezanino", description: "Proteção horizontal para piso superior", priceAdj: 0 },
+    { id: "varanda", title: "Varanda", description: "Fechamento externo com reforço estrutural", priceAdj: 220 },
+    { id: "piscina", title: "Piscina", description: "Resistente a umidade e cloro. Fixação especial", priceAdj: 380 },
+  ],
+  espelho: [
+    { id: "simples", title: "Liso Simples", description: "Sem acabamento nas bordas. Fixação direta na parede", priceAdj: 0, recommended: true },
+    { id: "bisote", title: "Com Bisotê", description: "Borda chanfrada em 45°. Acabamento elegante e seguro", priceAdj: 95 },
+    { id: "lapidado", title: "Lapidado", description: "Borda polida manualmente. Visual refinado e premium", priceAdj: 150 },
+    { id: "decorativo", title: "Decorativo", description: "Formas personalizadas: redondo, oval, geométrico", priceAdj: 240 },
+  ],
+};
+
 export interface PriceTable {
   basePerM2: number;
   glassMultiplier: Record<GlassType, number>;
@@ -50,6 +93,7 @@ export const PRICE_TABLES: Record<ProductType, PriceTable> = {
 
 export interface QuoteConfig {
   product: ProductType;
+  subtype?: ProductSubtype;
   width: number;
   height: number;
   glassType: GlassType;
@@ -73,18 +117,24 @@ export function calculateQuote(config: QuoteConfig): {
   const profileCost = table.profilePrice[config.profile];
   const installCost = table.installationPrice[config.installation];
 
-  const unitPrice = Math.max(glassBase + thicknessAdjust + profileCost + installCost, table.minimumPrice);
+  const subtypeOptions = config.subtype
+    ? PRODUCT_SUBTYPES[config.product].find((o) => o.id === config.subtype)
+    : null;
+  const subtypeCost = subtypeOptions?.priceAdj ?? 0;
+
+  const unitPrice = Math.max(
+    glassBase + thicknessAdjust + profileCost + installCost + subtypeCost,
+    table.minimumPrice
+  );
   const total = unitPrice * config.quantity;
 
-  return {
-    area,
-    subtotal: unitPrice,
-    total,
-    breakdown: [
-      { label: "Vidro base", value: glassBase },
-      { label: "Espessura", value: thicknessAdjust },
-      { label: "Perfil", value: profileCost },
-      { label: "Instalação", value: installCost },
-    ],
-  };
+  const breakdown: { label: string; value: number }[] = [
+    { label: "Vidro base", value: glassBase },
+    { label: "Espessura", value: thicknessAdjust },
+    { label: "Perfil", value: profileCost },
+    { label: "Instalação", value: installCost },
+  ];
+  if (subtypeCost > 0) breakdown.push({ label: "Configuração especial", value: subtypeCost });
+
+  return { area, subtotal: unitPrice, total, breakdown };
 }
