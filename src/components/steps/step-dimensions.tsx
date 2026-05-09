@@ -2,36 +2,21 @@
 
 import { useState } from "react";
 import { useQuoteStore } from "@/store/quote-store";
-import { StepHeading } from "@/components/ui/step-heading";
 import { StepActions } from "@/components/ui/step-actions";
 import { cn } from "@/lib/utils";
 
-const PRESETS = [
-  { label: "90 × 200", w: 90, h: 200 },
-  { label: "100 × 210", w: 100, h: 210 },
-  { label: "120 × 200", w: 120, h: 200 },
-  { label: "150 × 220", w: 150, h: 220 },
-];
-
-const QTY_CHIPS = [
-  { value: 1, label: "1" },
-  { value: 2, label: "2" },
-  { value: 3, label: "3" },
-  { value: 4, label: "4+" },
-];
+const QTY = [1, 2, 3, 4];
 
 export function StepDimensions() {
-  const { width, height, quantity, setDimensions, setQuantity, nextStep, prevStep } = useQuoteStore();
+  const { width, height, quantity, setDimensions, setQuantity, nextStep } = useQuoteStore();
   const [w, setW] = useState(String(width));
   const [h, setH] = useState(String(height));
   const [errors, setErrors] = useState<{ w?: string; h?: string }>({});
 
-  const qDisplay = quantity >= 4 ? 4 : quantity;
-
   function validate() {
     const e: { w?: string; h?: string } = {};
-    if (!w || Number(w) < 20) e.w = "mín. 20 cm";
-    if (!h || Number(h) < 20) e.h = "mín. 20 cm";
+    if (!w || Number(w) < 20) e.w = "mín. 20";
+    if (!h || Number(h) < 20) e.h = "mín. 20";
     setErrors(e);
     return !e.w && !e.h;
   }
@@ -44,91 +29,68 @@ export function StepDimensions() {
 
   return (
     <div className="flex flex-col flex-1">
-      <StepHeading>Qual o tamanho?</StepHeading>
+      <h1 className="text-[2.6rem] font-medium text-white leading-[1.08] tracking-tight mb-14">
+        Medidas
+      </h1>
 
-      {/* Presets rápidos */}
-      <div className="flex flex-wrap gap-2 mb-10">
-        {PRESETS.map((p) => {
-          const active = w === String(p.w) && h === String(p.h);
-          return (
-            <button
-              key={p.label}
-              onClick={() => { setW(String(p.w)); setH(String(p.h)); setErrors({}); }}
-              className={cn(
-                "h-8 px-3.5 rounded-lg text-[12px] font-medium tracking-wide",
-                "transition-all duration-150 focus-visible:outline-none",
-                active
-                  ? "bg-white text-zinc-950"
-                  : "bg-white/[0.04] text-white/25 border border-white/[0.08] hover:text-white/50"
-              )}
-            >
-              {p.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Inputs largura e altura */}
-      <div className="grid grid-cols-2 gap-4 mb-10">
-        {[
+      {/* Width + Height inputs */}
+      <div className="grid grid-cols-2 gap-8 mb-14">
+        {([
           { label: "Largura", val: w, set: setW, err: errors.w },
           { label: "Altura",  val: h, set: setH, err: errors.h },
-        ].map(({ label, val, set, err }) => (
+        ] as const).map(({ label, val, set, err }) => (
           <div key={label}>
-            <label className="block text-[10px] text-white/20 uppercase tracking-[0.14em] mb-2.5">
+            <label className="block text-[10px] text-white/20 uppercase tracking-[0.14em] mb-4">
               {label}
             </label>
-            <div className="relative">
+            <div className="relative border-b transition-colors duration-150"
+              style={{ borderColor: err ? "rgba(248,113,113,0.3)" : "rgba(255,255,255,0.08)" }}
+            >
               <input
                 type="number"
                 value={val}
                 onChange={(e) => { set(e.target.value); setErrors({}); }}
                 min={20}
                 max={500}
-                className={cn(
-                  "w-full h-14 bg-white/[0.04] border rounded-xl px-4 pr-11",
-                  "text-white text-[15px] font-medium outline-none",
-                  "transition-colors duration-150 placeholder:text-white/10",
-                  err
-                    ? "border-red-500/30"
-                    : "border-white/[0.09] focus:border-white/20"
-                )}
+                className="w-full bg-transparent text-[2.2rem] font-medium text-white outline-none pb-3 pr-10 tracking-tight placeholder:text-white/10"
+                placeholder="0"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] text-white/20 pointer-events-none">
+              <span className="absolute right-0 bottom-3.5 text-[13px] text-white/20 pointer-events-none">
                 cm
               </span>
             </div>
-            {err && <p className="text-[11px] text-red-400/70 mt-1.5">{err}</p>}
+            {err && <p className="text-[10px] text-red-400/60 mt-2">{err}</p>}
           </div>
         ))}
       </div>
 
-      {/* Quantidade */}
-      <div>
-        <p className="text-[10px] text-white/20 uppercase tracking-[0.14em] mb-4">Quantidade</p>
-        <div className="flex gap-2">
-          {QTY_CHIPS.map((chip) => {
-            const sel = chip.value === qDisplay;
+      {/* Quantity */}
+      <div className="mb-auto">
+        <p className="text-[10px] text-white/20 uppercase tracking-[0.14em] mb-5">Quantidade</p>
+        <div className="flex gap-2.5">
+          {QTY.map((n) => {
+            const label = n === 4 ? "4+" : String(n);
+            const sel = n === 4 ? quantity >= 4 : quantity === n;
             return (
               <button
-                key={chip.value}
-                onClick={() => setQuantity(chip.value)}
+                key={n}
+                onClick={() => setQuantity(n)}
                 className={cn(
-                  "w-12 h-12 rounded-xl text-[14px] font-semibold tracking-tight",
-                  "transition-all duration-150 focus-visible:outline-none",
+                  "w-12 h-12 rounded-xl text-[14px] font-medium tracking-tight",
+                  "transition-all duration-150",
                   sel
                     ? "bg-white text-zinc-950"
-                    : "bg-white/[0.04] text-white/25 border border-white/[0.08] hover:text-white/50"
+                    : "text-white/25 border border-white/[0.07] hover:text-white/45 hover:border-white/[0.14]"
                 )}
               >
-                {chip.label}
+                {label}
               </button>
             );
           })}
         </div>
       </div>
 
-      <StepActions onNext={handleContinue} onBack={prevStep} />
+      <StepActions onNext={handleContinue} />
     </div>
   );
 }

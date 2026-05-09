@@ -1,11 +1,6 @@
-interface StepHeadingProps {
-  children: React.ReactNode;
-}
-
-/** Título principal de cada step — assertivo, respirando */
-export function StepHeading({ children }: StepHeadingProps) {
+export function StepHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h1 className="text-[2.15rem] font-medium text-white leading-[1.1] tracking-tight mb-11">
+    <h1 className="text-[2.6rem] font-medium text-white leading-[1.08] tracking-tight mb-14">
       {children}
     </h1>
   );

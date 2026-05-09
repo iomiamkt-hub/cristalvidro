@@ -6,25 +6,35 @@ import { useQuoteStore } from "@/store/quote-store";
 import type { ProductType, ProductSubtype } from "@/lib/pricing";
 import { PRODUCT_SUBTYPES } from "@/lib/pricing";
 import { PRODUCTS } from "./product-data";
-import { PRODUCT_ICONS } from "./product-icons";
-import { StepHeading } from "@/components/ui/step-heading";
-import { StepActions } from "@/components/ui/step-actions";
 import { cn } from "@/lib/utils";
+
+const fadeY = {
+  initial: (d: number) => ({ opacity: 0, y: d * 16 }),
+  animate: { opacity: 1, y: 0 },
+  exit: (d: number) => ({ opacity: 0, y: d * -12 }),
+  transition: { duration: 0.2, ease: "easeOut" as const },
+};
 
 export function StepProduct() {
   const { product, subtype, setProduct, setSubtype, nextStep } = useQuoteStore();
   const [phase, setPhase] = useState<"product" | "subtype">(product ? "subtype" : "product");
   const [dir, setDir] = useState(1);
 
-  const selectedDef = PRODUCTS.find((p) => p.id === product) ?? null;
   const subtypes = product ? PRODUCT_SUBTYPES[product] : [];
 
-  function handleProductSelect(id: ProductType) {
+  async function handleProductSelect(id: ProductType) {
     setProduct(id);
     const def = PRODUCT_SUBTYPES[id].find((o) => o.recommended) ?? PRODUCT_SUBTYPES[id][0];
     setSubtype(def.id as ProductSubtype);
     setDir(1);
-    setTimeout(() => setPhase("subtype"), 110);
+    await new Promise((r) => setTimeout(r, 120));
+    setPhase("subtype");
+  }
+
+  async function handleSubtypeSelect(id: string) {
+    setSubtype(id as ProductSubtype);
+    await new Promise((r) => setTimeout(r, 260));
+    nextStep();
   }
 
   function handleBack() {
@@ -34,131 +44,103 @@ export function StepProduct() {
 
   return (
     <div className="flex flex-col flex-1">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={dir}>
 
-        {/* ── Fase 1: produto ── */}
         {phase === "product" && (
           <motion.div
             key="product"
-            initial={{ opacity: 0, y: dir > 0 ? 14 : -14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: dir > 0 ? -10 : 10 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            custom={dir}
+            variants={fadeY}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={fadeY.transition}
             className="flex flex-col flex-1"
           >
-            <StepHeading>O que você precisa?</StepHeading>
+            <h1 className="text-[2.6rem] font-medium text-white leading-[1.08] tracking-tight mb-14">
+              O que você<br />precisa?
+            </h1>
 
-            <div className="grid grid-cols-2 gap-3">
-              {PRODUCTS.map((p) => {
-                const Icon = PRODUCT_ICONS[p.id];
-                const sel = product === p.id;
-                return (
-                  <motion.button
-                    key={p.id}
-                    onClick={() => handleProductSelect(p.id)}
-                    whileTap={{ scale: 0.96 }}
-                    className={cn(
-                      "relative flex flex-col p-6 rounded-2xl border text-left",
-                      "transition-all duration-250 min-h-[180px]",
-                      "focus-visible:outline-none",
-                      sel
-                        ? "border-white/25 bg-white/[0.05]"
-                        : "border-white/[0.09] bg-white/[0.02] hover:border-white/[0.16]"
-                    )}
-                  >
-                    {/* Ícone dominante */}
-                    <div className={cn(
-                      "flex-1 flex items-center transition-colors duration-250",
-                      sel ? "text-white" : "text-white/25 group-hover:text-white/40"
-                    )}>
-                      <Icon size={52} />
-                    </div>
-
-                    {/* Título como legenda */}
-                    <p className={cn(
-                      "text-[13px] font-medium tracking-tight mt-5 transition-colors duration-250 leading-tight",
-                      sel ? "text-white" : "text-white/35"
-                    )}>
-                      {p.title}
-                    </p>
-
-                    {/* Check discreto */}
-                    {sel && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                        className="absolute top-4 right-4 w-[18px] h-[18px] rounded-full bg-white flex items-center justify-center"
-                      >
-                        <svg className="w-[9px] h-[9px] text-zinc-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </motion.div>
-                    )}
-                  </motion.button>
-                );
-              })}
+            <div>
+              {PRODUCTS.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handleProductSelect(p.id)}
+                  className={cn(
+                    "w-full text-left py-6 border-b border-white/[0.05]",
+                    "flex items-center justify-between group",
+                    "transition-all duration-200"
+                  )}
+                >
+                  <span className={cn(
+                    "text-[1.5rem] font-medium tracking-tight transition-colors duration-200",
+                    product === p.id ? "text-white" : "text-white/22 group-hover:text-white/55"
+                  )}>
+                    {p.title}
+                  </span>
+                  {product === p.id && (
+                    <motion.div
+                      layoutId="prod-dot"
+                      className="w-[7px] h-[7px] rounded-full bg-white flex-shrink-0"
+                    />
+                  )}
+                </button>
+              ))}
             </div>
           </motion.div>
         )}
 
-        {/* ── Fase 2: subtipo ── */}
-        {phase === "subtype" && selectedDef && (
+        {phase === "subtype" && product && (
           <motion.div
             key="subtype"
-            initial={{ opacity: 0, y: dir > 0 ? 14 : -14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: dir > 0 ? -10 : 10 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            custom={dir}
+            variants={fadeY}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={fadeY.transition}
             className="flex flex-col flex-1"
           >
-            <StepHeading>
-              {selectedDef.title}
-            </StepHeading>
+            <h1 className="text-[2.6rem] font-medium text-white leading-[1.08] tracking-tight mb-14">
+              {PRODUCTS.find((p) => p.id === product)?.title}
+            </h1>
 
-            <div>
-              {subtypes.map((opt, i) => (
-                <motion.button
+            <div className="flex-1">
+              {subtypes.map((opt) => (
+                <button
                   key={opt.id}
-                  onClick={() => setSubtype(opt.id as ProductSubtype)}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.04 }}
-                  whileTap={{ scale: 0.995 }}
+                  onClick={() => handleSubtypeSelect(opt.id)}
                   className={cn(
-                    "w-full flex items-center justify-between py-[18px]",
-                    "border-b border-white/[0.06] last:border-0",
-                    "text-left focus-visible:outline-none group cursor-pointer"
+                    "w-full text-left py-6 border-b border-white/[0.05]",
+                    "flex items-center justify-between group",
+                    "transition-all duration-200"
                   )}
                 >
-                  <p className={cn(
-                    "text-[15px] font-medium tracking-tight transition-colors duration-150",
-                    subtype === opt.id ? "text-white" : "text-white/35 group-hover:text-white/65"
+                  <span className={cn(
+                    "text-[1.5rem] font-medium tracking-tight transition-colors duration-200",
+                    subtype === opt.id ? "text-white" : "text-white/22 group-hover:text-white/55"
                   )}>
                     {opt.title}
-                  </p>
-
-                  <div className={cn(
-                    "w-[18px] h-[18px] rounded-full border flex-shrink-0 ml-4",
-                    "flex items-center justify-center transition-all duration-200",
-                    subtype === opt.id
-                      ? "border-white"
-                      : "border-white/[0.18] group-hover:border-white/35"
-                  )}>
+                  </span>
+                  {subtype === opt.id && (
                     <motion.div
-                      initial={false}
-                      animate={subtype === opt.id ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 420, damping: 26 }}
-                      className="w-[8px] h-[8px] rounded-full bg-white"
+                      layoutId="sub-dot"
+                      className="w-[7px] h-[7px] rounded-full bg-white flex-shrink-0"
                     />
-                  </div>
-                </motion.button>
+                  )}
+                </button>
               ))}
             </div>
 
-            <StepActions onNext={nextStep} onBack={handleBack} disabled={!subtype} />
+            <button
+              onClick={handleBack}
+              className="mt-10 text-[12px] text-white/18 hover:text-white/40 transition-colors self-start"
+            >
+              ← Produtos
+            </button>
           </motion.div>
         )}
+
       </AnimatePresence>
     </div>
   );

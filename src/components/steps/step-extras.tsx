@@ -1,17 +1,15 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useQuoteStore } from "@/store/quote-store";
 import type { ProfileType, InstallationType } from "@/lib/pricing";
-import { SelectRow } from "@/components/ui/select-row";
-import { ChipGroup } from "@/components/ui/chip-group";
-import { StepHeading } from "@/components/ui/step-heading";
-import { StepActions } from "@/components/ui/step-actions";
+import { cn } from "@/lib/utils";
 
-const PROFILES: { id: ProfileType; label: string; sublabel: string }[] = [
-  { id: "sem-perfil",  label: "Sem perfil",       sublabel: "Fixação direta" },
-  { id: "aluminio",    label: "Alumínio",          sublabel: "Resistente e econômico" },
-  { id: "inox",        label: "Inox escovado",     sublabel: "Alta durabilidade" },
-  { id: "preto-fosco", label: "Preto fosco",       sublabel: "Design contemporâneo" },
+const PROFILES: { id: ProfileType; label: string }[] = [
+  { id: "sem-perfil",  label: "Sem perfil" },
+  { id: "aluminio",    label: "Alumínio" },
+  { id: "inox",        label: "Inox escovado" },
+  { id: "preto-fosco", label: "Preto fosco" },
 ];
 
 const INSTALLS: { value: InstallationType; label: string }[] = [
@@ -21,33 +19,69 @@ const INSTALLS: { value: InstallationType; label: string }[] = [
 ];
 
 export function StepExtras() {
-  const { profile, installation, setProfile, setInstallation, nextStep, prevStep } = useQuoteStore();
+  const { profile, installation, setProfile, setInstallation, nextStep } = useQuoteStore();
+
+  async function handleInstall(v: InstallationType) {
+    setInstallation(v);
+    await new Promise((r) => setTimeout(r, 260));
+    nextStep();
+  }
 
   return (
     <div className="flex flex-col flex-1">
-      <StepHeading>Acabamento</StepHeading>
+      <h1 className="text-[2.6rem] font-medium text-white leading-[1.08] tracking-tight mb-14">
+        Acabamento
+      </h1>
 
-      <div className="mb-10">
-        {PROFILES.map((p, i) => (
-          <SelectRow
+      {/* Profile list */}
+      <div className="mb-14">
+        {PROFILES.map((p) => (
+          <button
             key={p.id}
-            label={p.label}
-            sublabel={p.sublabel}
-            selected={profile === p.id}
             onClick={() => setProfile(p.id)}
-            index={i}
-          />
+            className={cn(
+              "w-full text-left py-6 border-b border-white/[0.05]",
+              "flex items-center justify-between group",
+              "transition-all duration-200"
+            )}
+          >
+            <span className={cn(
+              "text-[1.5rem] font-medium tracking-tight transition-colors duration-200",
+              profile === p.id ? "text-white" : "text-white/22 group-hover:text-white/55"
+            )}>
+              {p.label}
+            </span>
+            {profile === p.id && (
+              <motion.div
+                layoutId="profile-dot"
+                className="w-[7px] h-[7px] rounded-full bg-white flex-shrink-0"
+              />
+            )}
+          </button>
         ))}
       </div>
 
-      <ChipGroup
-        label="Instalação"
-        options={INSTALLS}
-        value={installation}
-        onChange={setInstallation}
-      />
-
-      <StepActions onNext={nextStep} onBack={prevStep} nextLabel="Ver orçamento" />
+      {/* Installation — tap to advance */}
+      <div>
+        <p className="text-[10px] text-white/20 uppercase tracking-[0.14em] mb-5">Instalação</p>
+        <div className="flex gap-2.5">
+          {INSTALLS.map((inst) => (
+            <button
+              key={inst.value}
+              onClick={() => handleInstall(inst.value)}
+              className={cn(
+                "flex-1 h-11 rounded-xl text-[13px] font-medium tracking-tight",
+                "transition-all duration-150",
+                installation === inst.value
+                  ? "bg-white text-zinc-950"
+                  : "text-white/25 border border-white/[0.07] hover:text-white/45 hover:border-white/[0.14]"
+              )}
+            >
+              {inst.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

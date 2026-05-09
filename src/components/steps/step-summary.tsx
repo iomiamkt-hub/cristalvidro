@@ -6,84 +6,74 @@ import { calculateQuote, PRODUCT_SUBTYPES } from "@/lib/pricing";
 import { formatCurrency } from "@/lib/utils";
 import { StepActions } from "@/components/ui/step-actions";
 
-const L = {
-  product:  { box: "Box de Banheiro", sacada: "Sacada", "guarda-corpo": "Guarda-corpo", espelho: "Espelho" },
-  glass:    { temperado: "Temperado", laminado: "Laminado", jateado: "Jateado", espelhado: "Espelhado" },
-  profile:  { "sem-perfil": "Sem perfil", aluminio: "Alumínio", inox: "Inox", "preto-fosco": "Preto fosco" },
-  install:  { parafuso: "Parafuso", embutido: "Embutido", frameless: "Frameless" },
-} as const;
+const GLASS_L: Record<string, string> = {
+  temperado: "Temperado", laminado: "Laminado", jateado: "Jateado", espelhado: "Espelhado",
+};
+const PROFILE_L: Record<string, string> = {
+  "sem-perfil": "Sem perfil", aluminio: "Alumínio", inox: "Inox", "preto-fosco": "Preto fosco",
+};
 
 export function StepSummary() {
   const s = useQuoteStore();
-  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, nextStep, prevStep } = s;
+  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, nextStep } = s;
 
   if (!product) return null;
 
   const result = calculateQuote({ product, subtype: subtype ?? undefined, width, height, glassType, thickness, profile, installation, quantity });
   const subtypeLabel = subtype ? PRODUCT_SUBTYPES[product].find((o) => o.id === subtype)?.title : null;
 
-  const specs = [
-    { label: "Produto",    value: `${L.product[product]}${subtypeLabel ? ` · ${subtypeLabel}` : ""}` },
-    { label: "Medidas",    value: `${width} × ${height} cm${quantity > 1 ? ` · ${quantity} peças` : ""}` },
-    { label: "Vidro",      value: `${L.glass[glassType]} · ${thickness} mm` },
-    { label: "Acabamento", value: `${L.profile[profile]} · ${L.install[installation]}` },
+  const lines = [
+    subtypeLabel ?? { box: "Box de Banheiro", sacada: "Sacada", "guarda-corpo": "Guarda-corpo", espelho: "Espelho" }[product],
+    `${width} × ${height} cm${quantity > 1 ? ` · ${quantity} peças` : ""}`,
+    `${GLASS_L[glassType]} ${thickness} mm · ${PROFILE_L[profile]}`,
   ];
 
   return (
     <div className="flex flex-col flex-1">
 
-      {/* Bloco do preço */}
+      {/* Price */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.45 }}
-        className="mb-12"
+        transition={{ duration: 0.5 }}
+        className="mb-16"
       >
-        <p className="text-[10px] text-white/20 uppercase tracking-[0.16em] mb-5">
+        <p className="text-[10px] text-white/18 uppercase tracking-[0.18em] mb-6">
           Estimativa
         </p>
         <motion.p
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.06 }}
-          className="text-[3.6rem] font-medium text-white tracking-tight leading-none tabular-nums"
+          transition={{ duration: 0.5, delay: 0.08 }}
+          className="text-[4rem] font-medium text-white tracking-tight leading-none tabular-nums"
         >
           {formatCurrency(result.total)}
         </motion.p>
         {quantity > 1 && (
-          <p className="text-[13px] text-white/25 mt-3 tabular-nums">
-            {formatCurrency(result.subtotal)} × {quantity} peças
+          <p className="text-[12px] text-white/22 mt-3 tabular-nums">
+            {formatCurrency(result.subtotal)} por peça
           </p>
         )}
       </motion.div>
 
-      {/* Especificações */}
+      {/* Spec lines */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.14 }}
-        className="border-t border-white/[0.07]"
+        transition={{ duration: 0.4, delay: 0.18 }}
+        className="border-t border-white/[0.06] mb-auto"
       >
-        {specs.map((row) => (
-          <div
-            key={row.label}
-            className="flex items-baseline justify-between py-4 border-b border-white/[0.06]"
+        {lines.map((line, i) => (
+          <p
+            key={i}
+            className="text-[13px] text-white/35 py-4 border-b border-white/[0.04] leading-snug"
           >
-            <span className="text-[11px] text-white/20 uppercase tracking-[0.1em] flex-shrink-0 mr-4">
-              {row.label}
-            </span>
-            <span className="text-[13px] text-white/55 text-right">
-              {row.value}
-            </span>
-          </div>
+            {line}
+          </p>
         ))}
       </motion.div>
 
-      <p className="text-[11px] text-white/15 mt-5 leading-relaxed">
-        Valores estimados — orçamento final após vistoria gratuita.
-      </p>
-
-      <StepActions onNext={nextStep} onBack={prevStep} nextLabel="Solicitar orçamento" />
+      <StepActions onNext={nextStep} nextLabel="Solicitar orçamento" />
     </div>
   );
 }

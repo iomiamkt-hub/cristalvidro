@@ -44,7 +44,7 @@ function FieldInput({
 }
 
 export function StepContact() {
-  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, customerName, customerPhone, customerEmail, setCustomer, prevStep, reset } =
+  const { product, subtype, width, height, glassType, thickness, profile, installation, quantity, customerName, customerPhone, customerEmail, setCustomer, reset } =
     useQuoteStore();
 
   const [name, setName] = useState(customerName);
@@ -189,7 +189,6 @@ export function StepContact() {
 
       <StepActions
         onNext={handleSubmit}
-        onBack={prevStep}
         nextLabel="Receber orçamento"
         loading={loading}
       />
