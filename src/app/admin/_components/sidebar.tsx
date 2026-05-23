@@ -12,6 +12,7 @@ const NAV = [
   { href: "/admin/extras",      label: "Extras" },
   { href: "/admin/orcamentos",  label: "Orçamentos" },
   { href: "/admin/referencias", label: "Referências" },
+  { href: "/admin/whatsapp",    label: "WhatsApp" },
 ];
 
 export function AdminSidebar() {
