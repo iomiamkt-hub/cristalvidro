@@ -1,24 +1,218 @@
 @import "tailwindcss";
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* ─── Tailwind v4: tokens do Design System via @theme ────────────────────────
+   Em Tailwind v4 NÃO existe tailwind.config.ts para customização de tokens.
+   Tudo é definido aqui via @theme {} — gera automaticamente as classes utilitárias:
+     --color-*        → bg-*, text-*, border-*, fill-*, stroke-*, etc.
+     --font-*         → font-*
+     --text-*         → text-* (font-size)
+     --tracking-*     → tracking-*
+     --leading-*      → leading-*
+     --radius-*       → rounded-*
+     --spacing-*      → p-*, m-*, gap-*, w-*, h-*, etc.
+──────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Superfícies */
+  --color-background:     #080808;
+  --color-surface:        #111111;
+  --color-surface-raised: #161616;
+  --color-surface-hover:  #1a1a1a;
+
+  /* Identidade — Dourado Cristal Vidro */
+  --color-accent:         #E8D5B0;
+  --color-accent-dim:     rgba(232, 213, 176, 0.55);
+  --color-accent-glow:    rgba(232, 213, 176, 0.08);
+  --color-accent-border:  rgba(232, 213, 176, 0.20);
+
+  /* Semânticas */
+  --color-success:        #4ADE80;
+  --color-success-glow:   rgba(74, 222, 128, 0.10);
+  --color-warning:        #FBBF24;
+  --color-warning-glow:   rgba(251, 191, 36, 0.10);
+  --color-danger:         #F87171;
+  --color-danger-glow:    rgba(248, 113, 113, 0.10);
+
+  /* Texto */
+  --color-primary:        rgba(255, 255, 255, 0.92);
+  --color-secondary:      rgba(255, 255, 255, 0.45);
+  --color-muted:          rgba(255, 255, 255, 0.20);
+  --color-disabled:       rgba(255, 255, 255, 0.12);
+
+  /* Bordas */
+  --color-border:         rgba(255, 255, 255, 0.06);
+  --color-border-strong:  rgba(255, 255, 255, 0.12);
+  --color-border-focus:   rgba(255, 255, 255, 0.24);
+
+  /* ── Tipografia ── */
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Escala de tamanhos semântica */
+  --text-label:    11px;
+  --text-body:     13px;
+  --text-subtitle: 15px;
+  --text-title:    24px;
+  --text-hero:     36px;
+
+  /* Letter-spacing */
+  --tracking-label: 0.14em;
+  --tracking-wide:  0.08em;
+  --tracking-tight: -0.02em;
+
+  /* ── Border Radius ── */
+  --radius-card:   16px;
+  --radius-button: 12px;
+  --radius-input:  8px;
+  --radius-badge:  6px;
+
+  /* ── Espaçamento extra na escala padrão ── */
+  /* Tailwind v4 já tem --spacing escalonado. Adicionamos aliases semânticos */
+  --spacing-card:    24px;   /* p-card  → padding interno de card */
+  --spacing-section: 32px;   /* gap-section → gap entre seções */
+  --spacing-page:    40px;   /* p-page → padding de página */
+}
+
+/* ─── CSS custom properties globais (para uso direto em JavaScript/inline) ── */
+:root {
+  --cv-bg:              #080808;
+  --cv-surface:         #111111;
+  --cv-surface-raised:  #161616;
+  --cv-accent:          #E8D5B0;
+  --cv-border:          rgba(255, 255, 255, 0.06);
+  --cv-border-strong:   rgba(255, 255, 255, 0.12);
+}
+
+/* ─── Reset & Base ────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html {
   background: #080808;
-  color: #f5f5f5;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'tnum' 1;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   overflow-x: hidden;
 }
 
-body { background: #080808; min-height: 100dvh; }
+body {
+  background: #080808;
+  min-height: 100dvh;
+}
 
-::-webkit-scrollbar { width: 0; }
+/* ─── Scrollbar invisível ─────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ─── Inputs numéricos sem spinner ──────────────────────────────────────────*/
 
 input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 input[type="number"] { -moz-appearance: textfield; }
 
+/* ─── Focus ─────────────────────────────────────────────────────────────────*/
+
 :focus-visible { outline: none; }
+
+/* ─── Animações base ─────────────────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+/* ─── Utilitários CSS que o Tailwind não cobre diretamente ───────────────── */
+
+.animate-fade-in    { animation: fade-in  0.18s ease forwards; }
+.animate-slide-up   { animation: slide-up 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-scale-in   { animation: scale-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* Glassmorphism leve para superfícies premium */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Gradiente dourado para textos de destaque */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #E8D5B0 0%, #F5E6C8 40%, #C9A96E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow de accent para elementos de destaque */
+.glow-accent {
+  box-shadow:
+    0 0 0 1px rgba(232, 213, 176, 0.20),
+    0 4px 24px rgba(232, 213, 176, 0.08);
+}
+
+/* Linha separadora com gradiente fade */
+.divider-fade {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.08) 70%,
+    transparent
+  );
+}
+
+/* Skeleton de carregamento */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+@keyframes skeleton-sweep {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Tabela base */
+.table-row-hover {
+  transition: background-color 0.12s;
+}
+.table-row-hover:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
