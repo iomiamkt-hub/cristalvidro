@@ -37,8 +37,8 @@ export function AdminSidebar() {
             className={cn(
               "px-3 py-2.5 rounded-lg text-[13px] font-medium tracking-tight transition-all duration-150",
               active
-                ? "bg-white/[0.07] text-white"
-                : "text-white/35 hover:text-white/65 hover:bg-white/[0.03]"
+                ? "bg-white/[0.08] text-white"
+                : "text-white/35 hover:text-white/70 hover:bg-white/[0.04]"
             )}
           >
             {item.label}
@@ -50,23 +50,26 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-56 border-r border-white/[0.05] px-4 py-8 gap-8">
+      {/* Desktop sidebar — in-flow, sticky, full height */}
+      <aside className="hidden lg:flex flex-col w-56 flex-shrink-0 h-dvh sticky top-0 overflow-y-auto border-r border-white/[0.06] px-4 py-8 gap-8">
         <div>
-          <p className="text-[11px] text-white/20 uppercase tracking-[0.14em] mb-1">Cristal Vidro</p>
-          <p className="text-[13px] text-white/40 font-medium">Admin</p>
+          <p className="text-[10px] text-white/20 uppercase tracking-[0.16em] mb-1">Cristal Vidro</p>
+          <p className="text-[14px] text-white/50 font-medium">Admin</p>
         </div>
         {links}
         <button
           onClick={handleLogout}
-          className="text-[12px] text-white/18 hover:text-white/40 transition-colors text-left"
+          className="text-[12px] text-white/20 hover:text-white/45 transition-colors text-left"
         >
           Sair
         </button>
       </aside>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 h-14 border-b border-white/[0.05]" style={{ background: "#080808" }}>
+      <div
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 h-14 border-b border-white/[0.06]"
+        style={{ background: "#080808" }}
+      >
         <p className="text-[13px] text-white/50 font-medium tracking-tight">Cristal Vidro Admin</p>
         <button
           onClick={() => setOpen(!open)}
@@ -75,9 +78,9 @@ export function AdminSidebar() {
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             {open ? (
-              <path d="M5 5L15 15M5 15L15 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              <path d="M5 5L15 15M5 15L15 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
             ) : (
-              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
             )}
           </svg>
         </button>
@@ -98,8 +101,8 @@ export function AdminSidebar() {
         </div>
       )}
 
-      {/* Mobile spacer */}
-      <div className="lg:hidden h-14 w-full" />
+      {/* Mobile spacer so content clears the fixed top bar */}
+      <div className="lg:hidden h-14 w-full flex-shrink-0" />
     </>
   );
 }
